@@ -12,10 +12,11 @@ import { stdin, stdout } from "process";
 
 const rl = createInterface({ input: stdin, output: stdout });
 const textFormat = {
+  thinking: (s: string) => `\x1b[2;3;37m${s}\x1b[0m`, // dim italy grey
   toolCall: (s: string) => `\x1b[1;90m${s}\x1b[0m`, // bold grey
   done: (s: string) => `\x1b[1;32m${s}\x1b[0m`, // bold green
   error: (s: string) => `\x1b[1;31m${s}\x1b[0m`, // bold red
-  usage: (s: string) => `\x1b[3;94m${s}\x1b[0m`, // italic + orange
+  usage: (s: string) => `\x1b[3;94m${s}\x1b[0m`, // italic orange
 };
 
 function extractText(partial: unknown): string | null {
@@ -54,8 +55,24 @@ try {
   session.subscribe((event) => {
     switch (event.type) {
       case "message_update": {
-        if (event.assistantMessageEvent.type === "text_delta") {
-          process.stdout.write(event.assistantMessageEvent.delta);
+        const messageUpdateEvent = event.assistantMessageEvent;
+        switch (messageUpdateEvent.type) {
+          case "thinking_start": {
+            process.stdout.write(textFormat.thinking("\n💭 "));
+            return;
+          }
+          case "thinking_delta": {
+            process.stdout.write(textFormat.thinking(messageUpdateEvent.delta));
+            return;
+          }
+          case "thinking_end": {
+            process.stdout.write("\n\n");
+            return;
+          }
+          case "text_delta": {
+            process.stdout.write(messageUpdateEvent.delta);
+            return;
+          }
         }
         return;
       }

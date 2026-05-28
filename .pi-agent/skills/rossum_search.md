@@ -59,6 +59,12 @@ If a file is missing, ask the user to refresh it from the source above. Do not g
 3. **Fetch detail last.** Only pull a full endpoint, schema, or article once you know its exact key/slug.
 4. **Follow refs.** When an OpenAPI response references another schema, do a second `jq` lookup for that schema.
 
+## Data Location:
+
+```
+.pi-agent/skiils/../../data
+```
+
 ## Recipe book — OpenAPI
 
 List every path:
