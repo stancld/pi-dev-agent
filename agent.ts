@@ -15,6 +15,7 @@ const textFormat = {
   toolCall: (s: string) => `\x1b[1;90m${s}\x1b[0m`, // bold grey
   done: (s: string) => `\x1b[1;32m${s}\x1b[0m`, // bold green
   error: (s: string) => `\x1b[1;31m${s}\x1b[0m`, // bold red
+  usage: (s: string) => `\x1b[3;94m${s}\x1b[0m`, // italic + orange
 };
 
 function extractText(partial: unknown): string | null {
@@ -92,6 +93,17 @@ try {
     const userInput = (await rl.question("\n> ")).trim();
     if (!userInput || userInput === "exit") break;
     await session.prompt(userInput);
+
+    const msgs = session.state.messages;
+    const last = msgs[msgs.length - 1];
+    if (last?.role === "assistant") {
+      const u = last.usage;
+      process.stdout.write(
+        textFormat.usage(
+          `\nIn: ${u.input} / Out: ${u.output} / Cached in: ${u.cacheRead}\n`,
+        ),
+      );
+    }
   }
   session.state.messages.forEach((msg) => {
     console.log(msg);
