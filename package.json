@@ -1,13 +1,19 @@
 {
   "type": "module",
   "scripts": {
-    "start": "tsx agent.ts"
+    "start": "tsx agent.ts",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,js,json,md}": "prettier --write"
   },
   "dependencies": {
     "@earendil-works/pi-ai": "^0.76.0",
     "@earendil-works/pi-coding-agent": "^0.76.0"
   },
   "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.5",
     "prettier": "^3.8.3",
     "tsx": "^4.22.3",
     "typescript": "^6.0.3"
