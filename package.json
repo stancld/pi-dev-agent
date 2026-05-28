@@ -1,8 +1,13 @@
 {
   "type": "module",
+  "name": "elis-couper",
+  "bin": {
+    "elis-couper": "./dist/agent.js"
+  },
   "scripts": {
     "start": "tsx agent.ts",
-    "prepare": "husky"
+    "build": "tsc",
+    "prepare": "husky && tsc"
   },
   "lint-staged": {
     "*.{ts,js,json,md}": "prettier --write"
