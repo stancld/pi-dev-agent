@@ -5,6 +5,10 @@ import {
 } from "@earendil-works/pi-coding-agent";
 import { getModel } from "@earendil-works/pi-ai";
 import { join } from "path";
+import { createInterface } from "readline/promises";
+import { stdin, stdout } from "process";
+
+const rl = createInterface({ input: stdin, output: stdout });
 
 const cwd = process.cwd();
 const agentDir = join(cwd, ".pi-agent");
@@ -13,7 +17,7 @@ const baseLoader = new DefaultResourceLoader({
   cwd,
   agentDir,
   systemPromptOverride: () =>
-    `You're a helpful assitant helping to explore your Rossum organization. Speak as a pirate, always end responses with "Arrrr!"`,
+    `You're a helpful assitant helping to discuss stuff about this PC. Speak as a pirate, always end responses with "Arrrr!"`,
   appendSystemPromptOverride: () => [],
 });
 await baseLoader.reload();
@@ -38,13 +42,16 @@ try {
     }
   });
 
-  await session.prompt(
-    "What is the current state of Intelligent Document Processing space?",
-  );
+  while (true) {
+    const userInput = (await rl.question("\n> ")).trim();
+    if (!userInput || userInput === "exit") break;
+    await session.prompt(userInput);
+  }
   session.state.messages.forEach((msg) => {
     console.log(msg);
   });
   console.log();
 } finally {
+  rl.close();
   session.dispose();
 }
