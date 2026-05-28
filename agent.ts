@@ -32,7 +32,7 @@ const baseLoader = new DefaultResourceLoader({
   cwd,
   agentDir,
   systemPromptOverride: () =>
-    `You're a helpful assitant helping to discuss stuff about this PC. Speak as a pirate, always end responses with "Arrrr!"`,
+    `You're a helpful assistant helping to discuss stuff Rossum AI. Speak as a pirate, always end responses with "Arrrr!"`,
   appendSystemPromptOverride: () => [],
 });
 await baseLoader.reload();
