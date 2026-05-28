@@ -15,6 +15,16 @@ const textFormat = {
   error: (s: string) => `\x1b[1;31m${s}\x1b[0m`, // bold red
 };
 
+function extractText(partial: unknown): string | null {
+  if (!partial || typeof partial !== "object") return null;
+  if (!("content" in partial) || !Array.isArray(partial.content)) return null;
+  const first: unknown = partial.content[0];
+  if (!first || typeof first !== "object") return null;
+  if (!("type" in first) || first.type !== "text") return null;
+  if (!("text" in first) || typeof first.text !== "string") return null;
+  return first.text;
+}
+
 const cwd = process.cwd();
 const agentDir = join(cwd, ".pi-agent");
 
@@ -52,6 +62,16 @@ try {
         process.stdout.write(
           textFormat.toolCall(`\n→ ${toolName}(${JSON.stringify(args)})\n`),
         );
+        return;
+      }
+
+      case "tool_execution_update": {
+        const text = extractText(event.partialResult);
+        if (!text) return;
+        const lastLine = text.trimEnd().split("\n").pop() ?? "";
+        if (lastLine) {
+          process.stdout.write(textFormat.toolCall(`  … ${lastLine}\n`));
+        }
         return;
       }
 
