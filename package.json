@@ -1,5 +1,13 @@
 {
+  "type": "module",
+  "scripts": {
+    "start": "tsx agent.ts"
+  },
   "dependencies": {
     "@earendil-works/pi-coding-agent": "^0.76.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.22.3",
+    "typescript": "^6.0.3"
   }
 }
