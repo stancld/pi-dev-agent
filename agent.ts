@@ -9,6 +9,11 @@ import { createInterface } from "readline/promises";
 import { stdin, stdout } from "process";
 
 const rl = createInterface({ input: stdin, output: stdout });
+const textFormat = {
+  toolCall: (s: string) => `\x1b[1;90m${s}\x1b[0m`, // bold grey
+  done: (s: string) => `\x1b[1;32m${s}\x1b[0m`, // bold green
+  error: (s: string) => `\x1b[1;31m${s}\x1b[0m`, // bold red
+};
 
 const cwd = process.cwd();
 const agentDir = join(cwd, ".pi-agent");
@@ -34,11 +39,30 @@ const { session } = await createAgentSession({
 
 try {
   session.subscribe((event) => {
-    if (
-      event.type === "message_update" &&
-      event.assistantMessageEvent.type === "text_delta"
-    ) {
-      process.stdout.write(event.assistantMessageEvent.delta);
+    switch (event.type) {
+      case "message_update": {
+        if (event.assistantMessageEvent.type === "text_delta") {
+          process.stdout.write(event.assistantMessageEvent.delta);
+        }
+        return;
+      }
+
+      case "tool_execution_start": {
+        const { toolName, args } = event;
+        process.stdout.write(
+          textFormat.toolCall(`\n→ ${toolName}(${JSON.stringify(args)})\n`),
+        );
+        return;
+      }
+
+      case "tool_execution_end": {
+        process.stdout.write(
+          event.isError
+            ? textFormat.error("  ✗ error\n\n")
+            : textFormat.done("  ✓ done\n\n"),
+        );
+        return;
+      }
     }
   });
 
