@@ -6,9 +6,12 @@
   },
   "scripts": {
     "start": "tsx agent.ts",
-    "build": "tsc",
-    "prepare": "husky && tsc"
+    "build": "tsc && cp -r data dist/ && chmod +x dist/agent.js",
+    "prepare": "husky && npm run build"
   },
+  "files": [
+    "dist"
+  ],
   "lint-staged": {
     "*.{ts,js,json,md}": "prettier --write"
   },

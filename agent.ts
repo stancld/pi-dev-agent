@@ -10,12 +10,7 @@ import { join } from "path";
 import { createInterface } from "readline/promises";
 import { stdin, stdout } from "process";
 
-import {
-  getQueue,
-  getWorkspace,
-  listQueues,
-  listWorkspaces,
-} from "./rossum-api";
+import { rossumTools } from "./rossum-api.js";
 
 const rl = createInterface({ input: stdin, output: stdout });
 const textFormat = {
@@ -56,7 +51,7 @@ const { session } = await createAgentSession({
   model,
   resourceLoader: baseLoader,
   sessionManager: SessionManager.inMemory(),
-  customTools: [getQueue, getWorkspace, listQueues, listWorkspaces],
+  customTools: rossumTools,
 });
 
 try {
@@ -122,10 +117,17 @@ try {
     const msgs = session.state.messages;
     const last = msgs[msgs.length - 1];
     if (last?.role === "assistant") {
+      if (last.stopReason === "error" || last.errorMessage) {
+        process.stdout.write(
+          textFormat.error(
+            `\n✗ ${last.stopReason}: ${last.errorMessage ?? "unknown error"}\n`,
+          ),
+        );
+      }
       const u = last.usage;
       process.stdout.write(
         textFormat.usage(
-          `\nIn: ${u.input} / Out: ${u.output} / Cached in: ${u.cacheRead}\n`,
+          `\nIn: ${u.input} / Out: ${u.output} / Cache write: ${u.cacheWrite} / Cache read: ${u.cacheRead} / Total: ${u.totalTokens}\n`,
         ),
       );
     }
