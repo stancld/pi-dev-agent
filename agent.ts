@@ -10,6 +10,13 @@ import { join } from "path";
 import { createInterface } from "readline/promises";
 import { stdin, stdout } from "process";
 
+import {
+  getQueue,
+  getWorkspace,
+  listQueues,
+  listWorkspaces,
+} from "./rossum-api";
+
 const rl = createInterface({ input: stdin, output: stdout });
 const textFormat = {
   thinking: (s: string) => `\x1b[2;3;37m${s}\x1b[0m`, // dim italy grey
@@ -49,6 +56,7 @@ const { session } = await createAgentSession({
   model,
   resourceLoader: baseLoader,
   sessionManager: SessionManager.inMemory(),
+  customTools: [getQueue, getWorkspace, listQueues, listWorkspaces],
 });
 
 try {
